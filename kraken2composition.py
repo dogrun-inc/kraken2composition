@@ -3,7 +3,6 @@ from typing import List, NewType
 import argparse
 import re
 import json
-import pandas as pd
 
 Filepath = NewType("Filepath", str)
 
