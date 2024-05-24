@@ -1,3 +1,5 @@
 sample/
 sample/*
 __pycache__/
+memo/
+memo/*
