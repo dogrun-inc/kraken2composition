@@ -19,32 +19,14 @@ count,superkingdom,phylum,class,order,family,genus,species,strain,filename,sig_n
 対象となるディレクトリからファイル名を収集しRUN IDに変換したうえで
 RUNに紐づく組成データをBioProjectにネストし出力します。
 
-
+例 phylum.tsv (値は同じサンプルをidを変えて複製したもの)
 ```
-{
-"bioproject": "PRJDB0000",
-"compositions":
-    [
-        {
-            "run":"DRR0000",
-            "ranks":{
-                phylum: {
-                    "composition":{
-                        "taxonomy 1": num,
-                        "taxonomy 2": num,
-                    }
-                },
-                class: {
-                    "composition":{
-                        "taxonomy 1": num,
-                        "taxonomy 2": num,
-                    }
-                },,
-            }
-            
-        },
-    ]
-} 
+taxonomy        SRR7723005      SRR7723001
+Bacteroidota    81.4176652335257        81.4176652335257
+Actinomycetota  9.260924294191692       9.260924294191692
+Pseudomonadota  6.472021055729021       6.472021055729021
+Bacillota       2.011574111915777       2.011574111915777
+Bacillota_C     0.8378153046378185      0.8378153046378185
 ```
 
 
