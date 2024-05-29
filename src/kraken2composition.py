@@ -92,6 +92,9 @@ def zip_list(output_path, compositions: List[Dict[str, List[list]]]):
     """
     rankごとに別れた２次元リスト（系統組成テーブル）をzipしてファイル出力する
     """
+    # 出力先ディレクトリの存在を確認し、無い場合は作成する
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
     with zipfile.ZipFile(output_path, "w") as zf:
         for composition in compositions:
             rank = composition["rank"]
