@@ -49,9 +49,12 @@ Python3.9以上
 ファイルを指定して直接kraken2compositionを呼ぶことでサンプル単位でJSONを生成することもできます。"output file"を省略した場合は標準出力にJSONを渡します。
 
 ```
-python kraken2composition.py -i <input file> -o <output file>
+python kraken2composition.py -i <input file> -o <output file>　-e <extension>
 ```
 
+- -i: inputファイルのディレクトリを指定
+- -o: アウトプットファイルのディレクトリを指定
+- -e: 読み込む対象となるファイルの拡張子を指定。デフォルトで"csv"が指定されている
 
 
 

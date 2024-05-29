@@ -25,7 +25,7 @@ def get_args():
     parser.add_argument('-i', '--input', type=str, required=True)
     # --outputオプションはJSONを書き出すディレクトリの共通部分を指定する.プロジェクトの個別のURLは
     # プロジェクト名から自動的にスクリプト内で作成する
-    # parser.add_argument('-o', '--output', type=str)
+    parser.add_argument('-o', '--output', type=str)
     # kraken2形式の組成ファイルの拡張子を指定する。デフォルトはcsv
     parser.add_argument('-e', '--extension', type=str, default='csv')
     return parser.parse_args()
@@ -38,10 +38,11 @@ def get_file_list(input_path: str, file_extension: str) -> List[str]:
     :return:
     """
     import os
+    args = get_args()
     # 子階層の任意のディレクトリ名にマッチするワイルドカードを追加
     # file_names = glob.glob(input_path + '/*/*.' + file_extension)
     # 開発用のディレクトリ
-    file_names = glob.glob('../sample/*.csv*')
+    file_names = glob.glob(f'../sample/*.{args.extension}*')
     return file_names
 
 
@@ -205,14 +206,24 @@ def main():
             df_concat = concat_samples(dfs)
             df_concat = df_concat.T
             col_names = df_concat.columns.tolist()
+            # indexの文字列（taxonomy）でDFをソートする
+            df_concat = df_concat.sort_index()
             col_names.insert(0, "taxonomy")
+            # DFを2Dリストに変換
             lst = [list(x) for x in df_concat.to_records().tolist()]
+            # ヘッダ行を追加
             lst.insert(0, col_names)
             compositions.append({"rank": rank, "data": lst})
 
         # zipファイルに出力 << 処理の実行位置要検討
-        output_path = f"../sample/test/composition_{bp}.zip"
-        zip_list(output_path,compositions)
+        #output_path = f"../sample/test/composition_{bp}.zip"
+        path_base = args.output
+        project_name = bp
+        project_prefix = project_name[0:5]
+        project_number = project_name[5:]
+        converted_project_number = project_number.zfill(6)
+        project_dir = f"{path_base}/{project_prefix}/{converted_project_number[0:3]}/{project_prefix}{converted_project_number}/"
+        zip_list(project_dir,compositions)
         # ログに処理したプロジェクト名を追記
         logs(bp)
 
