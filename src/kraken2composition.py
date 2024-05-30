@@ -7,7 +7,6 @@ from typing import List, Dict
 import pandas as pd
 import argparse
 import zipfile
-import pickle
 
 from sra_id_convert import togoid_run2bioproject
 
@@ -15,7 +14,7 @@ from sra_id_convert import togoid_run2bioproject
 headers = ['count', 'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species', 'strain'
            'filename', 'sig_name', 'sig_md5', 'total_counts']
 # 出力する階級をリストで指定
-ranks = ["phylum", "family", "genus", "species"]
+ranks = ["phylum", "class", "order", "family", "genus", "species"]
 chunksize = 500
 
 
@@ -88,14 +87,16 @@ def chunks(lst, n):
         yield lst[i:i + n]
 
 
-def zip_list(output_path, compositions: List[Dict[str, List[list]]]):
+def zip_list(output_path:str, compositions: List[Dict[str, List[list]]]):
     """
+    # プロジェクト毎zipファイルを作成する場合の関数
     rankごとに別れた２次元リスト（系統組成テーブル）をzipしてファイル出力する
+
     """
     # 出力先ディレクトリの存在を確認し、無い場合は作成する
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-    with zipfile.ZipFile(output_path, "w") as zf:
+    with zipfile.ZipFile(f"{output_path}/composition.zip", "w") as zf:
         for composition in compositions:
             rank = composition["rank"]
             list_data = composition["data"]
@@ -105,6 +106,26 @@ def zip_list(output_path, compositions: List[Dict[str, List[list]]]):
             binary_data = csv_data.encode('utf-8')
             # Zipファイルに二次元リストを追加します
             zf.writestr(rank + ".tsv", binary_data)
+
+
+def write_list(output_path: str, compositions: List[Dict[str, List[list]]]):
+    """
+    rankごとに別れた２次元リスト（系統組成テーブル）をtsvファイルとして出力する
+    """
+    if not os.path.exists(output_path):
+        # os.makedirsは再起的にディレクトリを作成するのでプロジェクトディレクトリのしたの
+        # compositionsのディレクトリを指定する
+        output_path = output_path + "/compositions/"
+        os.makedirs(output_path)
+    for composition in compositions:
+        rank = composition["rank"]
+        list_data = composition["data"]
+        # ファイル名を作成
+        file_name = output_path + rank + ".tsv"
+        with open(file_name, "w") as f:
+            for row in list_data:
+                f.write("\t".join(map(str, row)) + "\n")
+
 
 
 def select_by_rank(rows: list, rank: str) -> List[list]:
@@ -218,15 +239,16 @@ def main():
             lst.insert(0, col_names)
             compositions.append({"rank": rank, "data": lst})
 
-        # zipファイルに出力 << 処理の実行位置要検討
-        #output_path = f"../sample/test/composition_{bp}.zip"
         path_base = args.output
         project_name = bp
         project_prefix = project_name[0:5]
         project_number = project_name[5:]
         converted_project_number = project_number.zfill(6)
-        project_dir = f"{path_base}/{project_prefix}/{converted_project_number[0:3]}/{project_prefix}{converted_project_number}/"
-        zip_list(project_dir,compositions)
+        # for development
+        output_path = f"../sample/test/{project_prefix}{converted_project_number}/"
+        # output_path = f"{path_base}/{project_prefix}/{converted_project_number[0:3]}/{project_prefix}{converted_project_number}/"
+        # zip_list(output_path,compositions)
+        write_list(output_path, compositions)
         # ログに処理したプロジェクト名を追記
         logs(bp)
 
