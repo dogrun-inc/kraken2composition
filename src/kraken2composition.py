@@ -245,8 +245,8 @@ def main():
         project_number = project_name[5:]
         converted_project_number = project_number.zfill(6)
         # for development
-        output_path = f"../sample/test/{project_prefix}{converted_project_number}/"
-        # output_path = f"{path_base}/{project_prefix}/{converted_project_number[0:3]}/{project_prefix}{converted_project_number}/"
+        # output_path = f"../sample/test/{project_prefix}{converted_project_number}/"
+        output_path = f"{path_base}/{project_prefix}/{converted_project_number[0:3]}/{project_prefix}{converted_project_number}/"
         # zip_list(output_path,compositions)
         write_list(output_path, compositions)
         # ログに処理したプロジェクト名を追記
