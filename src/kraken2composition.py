@@ -36,12 +36,12 @@ def get_file_list(input_path: str, file_extension: str) -> List[str]:
     :param input_path:
     :return:
     """
-    import os
     args = get_args()
     # 子階層の任意のディレクトリ名にマッチするワイルドカードを追加
+    # csv.txtのようなパターンがある場合ワイルドカードを追加する
     # file_names = glob.glob(input_path + '/*/*.' + file_extension)
     # 開発用のディレクトリ
-    file_names = glob.glob(f'../sample/*.{args.extension}*')
+    file_names = glob.glob(f'{input_path}/*.{args.extension}*')
     return file_names
 
 
@@ -89,11 +89,12 @@ def chunks(lst, n):
 
 def zip_list(output_path:str, compositions: List[Dict[str, List[list]]]):
     """
+    deplicated
     # プロジェクト毎zipファイルを作成する場合の関数
+    # zipはAPIで動的に行うためここでは非圧縮のまま書き出す関数を利用する
     rankごとに別れた２次元リスト（系統組成テーブル）をzipしてファイル出力する
-
     """
-    # 出力先ディレクトリの存在を確認し、無い場合は作成する
+    # 出力先ディレクトリの存在を確認し、無い場合は（再起的にディレクトリを）作成する
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     with zipfile.ZipFile(f"{output_path}/composition.zip", "w") as zf:
@@ -115,13 +116,12 @@ def write_list(output_path: str, compositions: List[Dict[str, List[list]]]):
     if not os.path.exists(output_path):
         # os.makedirsは再起的にディレクトリを作成するのでプロジェクトディレクトリのしたの
         # compositionsのディレクトリを指定する
-        output_path = output_path + "/compositions/"
         os.makedirs(output_path)
     for composition in compositions:
         rank = composition["rank"]
         list_data = composition["data"]
         # ファイル名を作成
-        file_name = output_path + rank + ".tsv"
+        file_name = output_path + "/" + rank + ".tsv"
         with open(file_name, "w") as f:
             for row in list_data:
                 f.write("\t".join(map(str, row)) + "\n")
@@ -221,7 +221,7 @@ def main():
             dfs = []
             for i, f in enumerate(filterd_files):
                 # kraken2形式のファイルを読み込み、組成テーブルを2Dリストとして取得する
-                lst = read_kraken2report(input_path + "/" + f)
+                lst = read_kraken2report(f)
                 # rankでフィルターする
                 lst_species = select_by_rank(lst, rank)
                 # sample_name = sample_names[run_list[i]]
@@ -246,7 +246,7 @@ def main():
         converted_project_number = project_number.zfill(6)
         # for development
         # output_path = f"../sample/test/{project_prefix}{converted_project_number}/"
-        output_path = f"{path_base}/{project_prefix}/{converted_project_number[0:3]}/{project_prefix}{converted_project_number}/"
+        output_path = f"{path_base}/{project_prefix}/{converted_project_number[0:3]}/{project_prefix}{converted_project_number}/compositions"
         # zip_list(output_path,compositions)
         write_list(output_path, compositions)
         # ログに処理したプロジェクト名を追記
