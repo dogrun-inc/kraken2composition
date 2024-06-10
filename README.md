@@ -38,19 +38,17 @@ Python3.9以上
 
 - ディレクトリを指定して変換
 
-ディレクトリを指定してディレクトリ内に含まれる（子階層も含めて）ファイルを変換し、BioProjectでネストしてJSONとして書き出します。
+ディレクトリを指定してディレクトリ内に含まれる（子階層も含めて）ファイルを変換し、プロジェクトに含まれるサンプルの系統組成をrankごとにtab textで書き出します。
 
-```
-
-```
 
 - ファイルを指定して変換
 
 ファイルを指定して直接kraken2compositionを呼ぶことでサンプル単位でJSONを生成することもできます。"output file"を省略した場合は標準出力にJSONを渡します。
 
 ```
-python kraken2composition.py -i <input file> -o <output file>　-e <extension>
+python kraken2composition.py -i ./private/megap -o ./public/project
 ```
+*入力と出力のパスは実行環境に合わせる
 
 - -i: inputファイルのディレクトリを指定
 - -o: アウトプットファイルのディレクトリを指定
